@@ -7,6 +7,11 @@ namespace io_multiplexer
         mEpollFd = epoll_create(MAX_EVENTS);
         mPollThread = std::thread(std::bind(&IOMultiplexer::pollForIO, this));
     }
+    IOMultiplexer &IOMultiplexer::getInstance()
+    {
+        static IOMultiplexer ioInstance;
+        return ioInstance;
+    }
     IOMultiplexer::~IOMultiplexer()
     {
         mPollThread.join();

@@ -11,11 +11,11 @@ void readHandler(io_multiplexer::ioObject obj, io_multiplexer::EventType t)
 
 int main()
 {
-	io_multiplexer::IOMultiplexer mult;
-	io_multiplexer::ioObject obj{0};
+	std::int32_t stdInputFd{0};
+	io_multiplexer::ioObject obj{stdInputFd};
 
-	mult.registerEvent(obj, io_multiplexer::EventType::READ, readHandler);
+	io_multiplexer::IOMultiplexer::getInstance().registerEvent(obj, io_multiplexer::EventType::READ, readHandler);
 	std::this_thread::sleep_for(std::chrono::seconds(5));
-	mult.deregisterEvent(obj, io_multiplexer::EventType::READ);
+	io_multiplexer::IOMultiplexer::getInstance().deregisterEvent(obj, io_multiplexer::EventType::READ);
 	return 0;
 }

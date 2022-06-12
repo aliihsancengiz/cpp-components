@@ -5,6 +5,7 @@
 #include <functional>
 #include <map>
 #include <thread>
+#include <memory>
 #include <sys/epoll.h>
 
 namespace io_multiplexer
@@ -31,13 +32,18 @@ namespace io_multiplexer
         typedef struct epoll_event epool_event;
         constexpr static int MAX_EVENTS = 255;
 
-        IOMultiplexer();
+        IOMultiplexer(const IOMultiplexer &) = delete;
+        IOMultiplexer &operator=(const IOMultiplexer &) = delete;
+
+        static IOMultiplexer &getInstance();
+
         ~IOMultiplexer();
 
         void registerEvent(const ioObject &ioObj, const EventType &type, Callback cb);
         void deregisterEvent(const ioObject &ioObj, const EventType &type);
 
     private:
+        IOMultiplexer();
         EventHandlerMap mEventHandlerMap;
         std::int32_t mEpollFd;
         std::thread mPollThread;
