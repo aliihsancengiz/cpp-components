@@ -7,14 +7,16 @@ namespace io_multiplexer
         mEpollFd = epoll_create(MAX_EVENTS);
         mPollThread = std::thread(std::bind(&IOMultiplexer::pollForIO, this));
     }
+    IOMultiplexer::~IOMultiplexer()
+    {
+        runFlag = false;
+        close(mEpollFd);
+        mPollThread.join();
+    }
     IOMultiplexer &IOMultiplexer::getInstance()
     {
         static IOMultiplexer ioInstance;
         return ioInstance;
-    }
-    IOMultiplexer::~IOMultiplexer()
-    {
-        mPollThread.join();
     }
     void IOMultiplexer::registerEvent(const ioObject &ioObj, const EventType &type, Callback cb)
     {
@@ -29,21 +31,31 @@ namespace io_multiplexer
     }
     void IOMultiplexer::deregisterEvent(const ioObject &ioObj, const EventType &type)
     {
-        mEventHandlerMap[ioObj.fd].erase(type);
         epoll_ctl(mEpollFd, EPOLL_CTL_DEL, ioObj.fd, NULL);
+        mEventHandlerMap[ioObj.fd].erase(type);
     }
     void IOMultiplexer::pollForIO()
     {
-        while (true)
+        while (runFlag)
         {
-            epoll_event events[5];
-            int nfds = epoll_wait(mEpollFd, events, 5, -1);
+            epoll_event events[MAX_EVENTS];
+            int nfds = epoll_wait(mEpollFd, events, MAX_EVENTS, 100);
             for (int n = 0; n < nfds; ++n)
             {
                 int fd = events[n].data.fd;
                 ioObject io{fd};
                 EventType type = static_cast<EventType>(events[n].events);
-                mEventHandlerMap[fd][type](io, type);
+
+                if (mEventHandlerMap.find(fd) != mEventHandlerMap.end() && mEventHandlerMap[fd].find(type) != mEventHandlerMap[fd].end() && (mEventHandlerMap[fd][type] != nullptr))
+                {
+                    try
+                    {
+                        mEventHandlerMap[fd][type](io, type);
+                    }
+                    catch (const std::exception &e)
+                    {
+                    }
+                }
             }
         }
     }
