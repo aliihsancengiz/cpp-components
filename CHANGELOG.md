@@ -3,6 +3,9 @@
 
 ## Unversioned Changes
 
+# 0.0.4
+    - Add Event implementation.
+
 # 0.0.3
     - Add Timer implementation.
 
