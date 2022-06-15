@@ -1,21 +1,44 @@
 #include "IOMultiplexer.hpp"
 #include "EventBus.hpp"
+#include "Timer.hpp"
+#include <mutex>
 
-void readHandler(io_multiplexer::ioObject obj, io_multiplexer::EventType t)
+void foo(int k)
 {
-	std::cout << "There someting to be read" << std::endl;
-	std::string ss;
-	std::cin >> ss;
-	std::cout << "Readed " << ss << std::endl;
+	std::cout << "Free Function Callback " << k << std::endl;
 }
 
+struct Foo
+{
+	Foo()
+	{
+		y = 100;
+	}
+	void operator()()
+	{
+		std::cout << "Functor Object Callback " << y << std::endl;
+	}
+
+private:
+	int y;
+};
 int main()
 {
-	std::int32_t stdInputFd{0};
-	io_multiplexer::ioObject obj{stdInputFd};
 
-	io_multiplexer::IOMultiplexer::getInstance().registerEvent(obj, io_multiplexer::EventType::READ, readHandler);
-	std::this_thread::sleep_for(std::chrono::seconds(5));
-	io_multiplexer::IOMultiplexer::getInstance().deregisterEvent(obj, io_multiplexer::EventType::READ);
+	timer::Timer t(1000, timer::TimerType::PERIODIC, std::bind(&foo, 1000));
+	timer::Timer t2(500, timer::TimerType::PERIODIC, []()
+					{ std::cout << "Lambda Callback" << std::endl; });
+	timer::Timer t3(500, timer::TimerType::PERIODIC, std::bind(Foo()));
+
+	t.start();
+	t2.start();
+	t3.start();
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+
+	t.stop();
+	t2.stop();
+	t3.stop();
+
 	return 0;
 }

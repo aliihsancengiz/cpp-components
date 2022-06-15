@@ -7,6 +7,7 @@
 #include <thread>
 #include <memory>
 #include <sys/epoll.h>
+#include <unistd.h>
 
 namespace io_multiplexer
 {
@@ -34,21 +35,22 @@ namespace io_multiplexer
 
         IOMultiplexer(const IOMultiplexer &) = delete;
         IOMultiplexer &operator=(const IOMultiplexer &) = delete;
+        ~IOMultiplexer();
 
         static IOMultiplexer &getInstance();
-
-        ~IOMultiplexer();
 
         void registerEvent(const ioObject &ioObj, const EventType &type, Callback cb);
         void deregisterEvent(const ioObject &ioObj, const EventType &type);
 
     private:
-        IOMultiplexer();
         EventHandlerMap mEventHandlerMap;
         std::int32_t mEpollFd;
         std::thread mPollThread;
+        bool runFlag{true};
 
         void pollForIO();
+
+        IOMultiplexer();
     };
 
 }
