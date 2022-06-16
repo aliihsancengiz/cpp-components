@@ -3,32 +3,28 @@
 #include "Timer.hpp"
 #include <mutex>
 #include "Event.hpp"
+#include "Logger.hpp"
 
 struct MyData
 {
 	int foo;
 };
 
-void MyDataHandler(MyData data)
-{
-	std::cout << "MyDataHandler : " << data.foo << std::endl;
-}
-void MyDataHandler2(MyData data)
-{
-	std::cout << "MyDataHandler2 : " << data.foo << std::endl;
-}
+void MyDataHandler(MyData data);
+void MyDataHandler2(MyData data);
+
+void TimerUseCae();
+void EventUseCase();
+
 int main()
 {
-	event::Event<MyData> mMydataHandler;
-	mMydataHandler.addSubscriber(MyDataHandler);
-	mMydataHandler.addSubscriber(MyDataHandler2);
 
-	for (int i = 0; i < 1000; i++)
-	{
-		mMydataHandler.sendEvent(MyData{i});
-	}
+	logger::LoggerConfigurator::getInstance().setLogLevel(logger::LogLevel::TRACE);
+	logger::LoggerConfigurator::getInstance().setLogTarget(logger::LogTarget::CONSOLE);
 
-	std::this_thread::sleep_for(std::chrono::seconds(2));
+	// TimerUseCae();
+	EventUseCase();
+
 	return 0;
 }
 
@@ -68,4 +64,26 @@ void TimerUseCae()
 	t.stop();
 	t2.stop();
 	t3.stop();
+}
+void EventUseCase()
+{
+	event::Event<MyData> mMydataHandler;
+	mMydataHandler.addSubscriber(MyDataHandler);
+	mMydataHandler.addSubscriber(MyDataHandler2);
+
+	for (int i = 0; i < 2; i++)
+	{
+		mMydataHandler.sendEvent(MyData{i});
+	}
+
+	std::this_thread::sleep_for(std::chrono::seconds(2));
+}
+
+void MyDataHandler(MyData data)
+{
+	std::cout << "MyDataHandler : " << data.foo << std::endl;
+}
+void MyDataHandler2(MyData data)
+{
+	std::cout << "MyDataHandler2 : " << data.foo << std::endl;
 }

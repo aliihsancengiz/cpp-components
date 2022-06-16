@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <sys/timerfd.h>
 #include "IOMultiplexer.hpp"
+#include "Logger.hpp"
 
 namespace timer
 {
@@ -23,6 +24,7 @@ namespace timer
 
     private:
         void _timerhandler(ioObject obj, EventType type);
+        std::shared_ptr<spdlog::logger> mLogger;
         std::uint64_t period;
         TimerType type;
         struct itimerspec new_value;

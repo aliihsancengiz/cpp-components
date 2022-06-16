@@ -3,6 +3,9 @@
 
 ## Unversioned Changes
 
+# 0.0.5
+    - Add Logger .
+
 # 0.0.4
     - Add Event implementation.
 
