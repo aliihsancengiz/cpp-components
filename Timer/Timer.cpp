@@ -5,13 +5,18 @@ namespace timer
     Timer::Timer(uint64_t _period, TimerType _type, TimerCallback _cb) : period(_period), type(_type), cb(_cb)
     {
         fd = timerfd_create(CLOCK_REALTIME, 0);
+        mLogger = logger::LoggerConfigurator::getInstance().getLogger("Timer-" + std::to_string(fd));
+        mLogger->trace("Timer Constructor");
+        mLogger->trace("Create a {} Timer with period of {}", type == TimerType::PERIODIC ? "Periodic" : "Oneshot", period);
     }
     Timer::~Timer()
     {
+        mLogger->trace("Timer Destructor");
         close(fd);
     }
     void Timer::start()
     {
+        mLogger->trace("Starting timer. Timer File Descriptor {}", fd);
         stopped = false;
         new_value.it_value.tv_sec = period / 1000;
         new_value.it_value.tv_nsec = (period % 1000) * 1000000;
@@ -30,6 +35,7 @@ namespace timer
     }
     void Timer::stop()
     {
+        mLogger->trace("Stopping timer. Timer File Descriptor {}", fd);
         io_multiplexer::IOMultiplexer::getInstance().deregisterEvent(*this, EventType::READ);
         stopped = true;
     }
@@ -44,6 +50,7 @@ namespace timer
             }
             if (!stopped)
             {
+                mLogger->trace("Got Timer expiration on File Descriptor {}", fd);
                 cb();
             }
         }

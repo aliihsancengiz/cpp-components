@@ -1,21 +1,17 @@
-set(TARGET_NAME iomultiplexer)
-
+set(TARGET_NAME logger)
 
 add_library(${TARGET_NAME}
-    IOMultiplexer.cpp
+    Logger.cpp
 )
-
 
 target_include_directories(${TARGET_NAME}
     PUBLIC
-        ${CMAKE_SOURCE_DIR}/Logger
+        ${CMAKE_CURRENT_SOURCE_DIR}
     PRIVATE
 )
 target_link_libraries(${TARGET_NAME}
     PUBLIC
-
+        
     PRIVATE
-        pthread
-        logger
-
 )
+

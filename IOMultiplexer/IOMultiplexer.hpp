@@ -8,6 +8,7 @@
 #include <memory>
 #include <sys/epoll.h>
 #include <unistd.h>
+#include "Logger.hpp"
 
 namespace io_multiplexer
 {
@@ -47,7 +48,7 @@ namespace io_multiplexer
         std::int32_t mEpollFd;
         std::thread mPollThread;
         bool runFlag{true};
-
+        std::shared_ptr<spdlog::logger> mLogger;
         void pollForIO();
 
         IOMultiplexer();
