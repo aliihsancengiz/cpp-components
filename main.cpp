@@ -4,6 +4,7 @@
 #include <mutex>
 #include "Event.hpp"
 #include "Logger.hpp"
+#include "Signal.hpp"
 
 struct MyData
 {
@@ -16,6 +17,18 @@ void MyDataHandler2(MyData data);
 void TimerUseCae();
 void EventUseCase();
 
+bool stopFlag = false;
+
+void handle_signal(struct signalfd_siginfo info)
+{
+	std::cout << "Got SIGINT signal No " << info.ssi_signo << std::endl;
+	stopFlag = true;
+}
+void handle_signal2(struct signalfd_siginfo info)
+{
+	std::cout << "Got SIGTERM signal No" << info.ssi_signo << std::endl;
+	stopFlag = true;
+}
 int main()
 {
 
@@ -23,7 +36,16 @@ int main()
 	logger::LoggerConfigurator::getInstance().setLogTarget(logger::LogTarget::CONSOLE);
 
 	// TimerUseCae();
-	EventUseCase();
+	// EventUseCase();
+	signal_handler::Signal ss;
+	ss.addSignalHandler(SIGINT, handle_signal);
+	ss.addSignalHandler(SIGTERM, handle_signal2);
+
+	ss.startHandling();
+	while (!stopFlag)
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	}
 
 	return 0;
 }

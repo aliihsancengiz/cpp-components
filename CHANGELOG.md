@@ -3,8 +3,11 @@
 
 ## Unversioned Changes
 
+# 0.0.6
+    - Add signal handling via file descriptor.
+
 # 0.0.5
-    - Add Logger .
+    - Add Logger.
 
 # 0.0.4
     - Add Event implementation.
