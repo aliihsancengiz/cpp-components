@@ -3,6 +3,9 @@
 
 ## Unversioned Changes
 
+# 0.0.7
+    - Make Event Bus singelton.
+
 # 0.0.6
     - Add signal handling via file descriptor.
 
