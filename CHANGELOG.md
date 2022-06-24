@@ -2,7 +2,8 @@
 
 
 ## Unversioned Changes
-- Add Clang Formatter
+- Add Clang Formatter.
+- Fix Github Action workflow file. 
 
 # 0.0.7
     - Make Event Bus singelton.
