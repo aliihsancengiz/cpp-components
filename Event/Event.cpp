@@ -1,6 +1,4 @@
 #include "Event.hpp"
 
-namespace event
-{
-
-} // namespace event
+namespace event {
+}  // namespace event

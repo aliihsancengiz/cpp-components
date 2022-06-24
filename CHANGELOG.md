@@ -2,6 +2,7 @@
 
 
 ## Unversioned Changes
+- Add Clang Formatter
 
 # 0.0.7
     - Make Event Bus singelton.
