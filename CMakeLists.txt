@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project("IO Multiplexer POC" VERSION 0.0.7)
+project("IO Multiplexer POC" VERSION 0.0.8)
 
 set(TARGET "ioMultiplexerPOC")
 
