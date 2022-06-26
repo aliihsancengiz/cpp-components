@@ -3,6 +3,9 @@
 
 ## Unversioned Changes
 
+# 0.0.9
+    - Add thread pool implementation.
+
 # 0.0.8
     - Improve event bus to work with variadic arguments.
     - Add Clang Formatter.

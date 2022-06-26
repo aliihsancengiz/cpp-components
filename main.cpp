@@ -3,6 +3,7 @@
 #include "IOMultiplexer.hpp"
 #include "Logger.hpp"
 #include "Signal.hpp"
+#include "ThreadPool.hpp"
 #include "Timer.hpp"
 
 #include <mutex>
@@ -30,6 +31,25 @@ void handle_signal2(struct signalfd_siginfo info)
     std::cout << "Got SIGTERM signal No" << info.ssi_signo << std::endl;
     stopFlag = true;
 }
+
+void threadpollUseCase()
+{
+    thread_pool::ThreadPool pool(3);
+    pool.dispatch([](auto id) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+        std::cout << "I am task  1 " << std::endl;
+    });
+    pool.dispatch([](auto id) {
+        std::cout << "I am task 2 " << std::endl;
+    });
+    pool.dispatch([](auto id) {
+        std::cout << "I am task 3 " << std::endl;
+    });
+    pool.dispatch([](auto id) {
+        std::cout << "I am task 4 " << std::endl;
+    });
+    std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+}
 int main()
 {
 
@@ -38,6 +58,7 @@ int main()
 
     // TimerUseCae();
     // EventUseCase();
+    // threadpollUseCase();
     signal_handler::Signal ss;
     ss.addSignalHandler(SIGINT, handle_signal);
     ss.addSignalHandler(SIGTERM, handle_signal2);
