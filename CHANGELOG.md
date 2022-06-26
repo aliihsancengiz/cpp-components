@@ -2,8 +2,11 @@
 
 
 ## Unversioned Changes
-- Add Clang Formatter.
-- Fix Github Action workflow file. 
+
+# 0.0.8
+    - Improve event bus to work with variadic arguments.
+    - Add Clang Formatter.
+    - Fix Github Action workflow file. 
 
 # 0.0.7
     - Make Event Bus singelton.
