@@ -1,4 +1,5 @@
 #pragma once
+#include "IOContext.hpp"
 #include "IOMultiplexer.hpp"
 #include "Logger.hpp"
 
@@ -9,7 +10,7 @@ template<typename TData>
 struct Event : io_multiplexer::ioObject
 {
     using handler = std::function<void(TData data)>;
-    Event()
+    Event(io_context::IOContext& io) : _io(io)
     {
         fd = ::eventfd(0, 0);
         mLogger =
@@ -43,6 +44,7 @@ struct Event : io_multiplexer::ioObject
   private:
     uint64_t counter{1};
     std::shared_ptr<spdlog::logger> mLogger;
+    io_context::IOContext& _io;
     std::vector<handler> mHandlerList;
     std::queue<TData> mEventQueue;
     void readHandler(io_multiplexer::ioObject io, io_multiplexer::EventType type)
@@ -57,7 +59,7 @@ struct Event : io_multiplexer::ioObject
                 mLogger->trace("Dispatching Events");
                 for (auto observer : mHandlerList) {
                     if (observer != nullptr) {
-                        observer(data);
+                        _io.post(observer, data);
                     }
                 }
             }

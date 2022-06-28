@@ -43,13 +43,12 @@ struct IOMultiplexer
     void registerEvent(const ioObject& ioObj, const EventType& type, Callback cb);
     void deregisterEvent(const ioObject& ioObj, const EventType& type);
 
+    void pollForIO();
+
   private:
     EventHandlerMap mEventHandlerMap;
     std::int32_t mEpollFd;
-    std::thread mPollThread;
-    bool runFlag{true};
     std::shared_ptr<spdlog::logger> mLogger;
-    void pollForIO();
 
     IOMultiplexer();
 };

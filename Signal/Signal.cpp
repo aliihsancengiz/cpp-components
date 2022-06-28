@@ -1,7 +1,7 @@
 #include "Signal.hpp"
 
 namespace signal_handler {
-Signal::Signal()
+Signal::Signal(io_context::IOContext& io) : _io(io)
 {
     mLogger = logger::LoggerConfigurator::getInstance().getLogger("Signal");
     mLogger->trace("Signal Constructor");
@@ -45,7 +45,7 @@ void Signal::_signalProcess(io_multiplexer::ioObject ioObj, io_multiplexer::Even
             return;
         }
         mLogger->trace("Caught new signal... SigNo : {}", info.ssi_signo);
-        mHandlerMap[info.ssi_signo](info);
+        _io.post(mHandlerMap[info.ssi_signo], info);
     }
 }
 

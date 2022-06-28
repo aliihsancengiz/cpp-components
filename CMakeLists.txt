@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project("IO Multiplexer POC" VERSION 0.0.9)
+project("IO Multiplexer POC" VERSION 0.1.0)
 
 set(TARGET "ioMultiplexerPOC")
 
@@ -15,6 +15,7 @@ add_subdirectory(Event)
 add_subdirectory(Logger)
 add_subdirectory(Signal)
 add_subdirectory(ThreadPool)
+add_subdirectory(IOContext)
 
 add_executable(${TARGET} main.cpp)
 
@@ -29,6 +30,7 @@ target_include_directories(${TARGET}
     ${CMAKE_SOURCE_DIR}/Logger
     ${CMAKE_SOURCE_DIR}/Signal
     ${CMAKE_SOURCE_DIR}/ThreadPool
+    ${CMAKE_SOURCE_DIR}/IOContext
 )
 
 target_link_libraries(${TARGET}
@@ -39,5 +41,6 @@ target_link_libraries(${TARGET}
     logger
     signal
     threadpool
+    iocontext
     PRIVATE
 )

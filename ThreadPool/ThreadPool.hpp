@@ -9,9 +9,10 @@
 #include <vector>
 
 namespace thread_pool {
+using Work = std::function<void()>;
+
 struct ThreadPool
 {
-    using Work = std::function<void()>;
     ThreadPool(std::size_t threadCount = 4);
     void dispatch(Work&& w);
     template<typename Func, typename... Args>

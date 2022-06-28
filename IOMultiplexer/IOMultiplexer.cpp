@@ -29,14 +29,11 @@ IOMultiplexer::IOMultiplexer()
     mLogger = logger::LoggerConfigurator::getInstance().getLogger("IOMultiplexer");
     mLogger->trace("Constructor");
     mEpollFd = epoll_create(MAX_EVENTS);
-    mPollThread = std::thread(std::bind(&IOMultiplexer::pollForIO, this));
 }
 IOMultiplexer::~IOMultiplexer()
 {
     mLogger->trace("Destructor");
-    runFlag = false;
     close(mEpollFd);
-    mPollThread.join();
 }
 IOMultiplexer& IOMultiplexer::getInstance()
 {
@@ -67,23 +64,21 @@ void IOMultiplexer::deregisterEvent(const ioObject& ioObj, const EventType& type
 }
 void IOMultiplexer::pollForIO()
 {
-    while (runFlag) {
-        epoll_event events[MAX_EVENTS];
-        int nfds = epoll_wait(mEpollFd, events, MAX_EVENTS, 100);
-        for (int n = 0; n < nfds; ++n) {
-            int fd = events[n].data.fd;
-            ioObject io{fd};
-            EventType type = static_cast<EventType>(events[n].events);
+    epoll_event events[MAX_EVENTS];
+    int nfds = epoll_wait(mEpollFd, events, MAX_EVENTS, 100);
+    for (int n = 0; n < nfds; ++n) {
+        int fd = events[n].data.fd;
+        ioObject io{fd};
+        EventType type = static_cast<EventType>(events[n].events);
 
-            if (mEventHandlerMap.find(fd) != mEventHandlerMap.end() &&
-                mEventHandlerMap[fd].find(type) != mEventHandlerMap[fd].end() &&
-                (mEventHandlerMap[fd][type] != nullptr)) {
-                try {
-                    mLogger->trace(" Got an Event on File Descriptor : {} , Event  : {} ", fd,
-                                   IOEventTypeToString(type));
-                    mEventHandlerMap[fd][type](io, type);
-                } catch (const std::exception& e) {
-                }
+        if (mEventHandlerMap.find(fd) != mEventHandlerMap.end() &&
+            mEventHandlerMap[fd].find(type) != mEventHandlerMap[fd].end() &&
+            (mEventHandlerMap[fd][type] != nullptr)) {
+            try {
+                mLogger->trace(" Got an Event on File Descriptor : {} , Event  : {} ", fd,
+                               IOEventTypeToString(type));
+                mEventHandlerMap[fd][type](io, type);
+            } catch (const std::exception& e) {
             }
         }
     }
