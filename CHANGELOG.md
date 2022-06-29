@@ -3,6 +3,9 @@
 
 ## Unversioned Changes
 
+# 0.1.0
+    - Add IO context object and integrate ioObjects(Timer,Event,Signal) with that.
+
 # 0.0.9
     - Add thread pool implementation.
 

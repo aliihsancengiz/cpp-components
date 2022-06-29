@@ -1,8 +1,8 @@
 #include "Timer.hpp"
 
 namespace timer {
-Timer::Timer(uint64_t _period, TimerType _type, TimerCallback _cb)
-    : period(_period), type(_type), cb(_cb)
+Timer::Timer(io_context::IOContext& io, uint64_t _period, TimerType _type, TimerCallback _cb)
+    : _io(io), period(_period), type(_type), cb(_cb)
 {
     fd = timerfd_create(CLOCK_REALTIME, 0);
     mLogger = logger::LoggerConfigurator::getInstance().getLogger("Timer-" + std::to_string(fd));
@@ -48,7 +48,7 @@ void Timer::_timerhandler(ioObject obj, EventType type)
         }
         if (!stopped) {
             mLogger->trace("Got Timer expiration on File Descriptor {}", fd);
-            cb();
+            _io.post(cb);
         }
     }
 }

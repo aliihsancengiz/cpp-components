@@ -1,4 +1,5 @@
 #pragma once
+#include "IOContext.hpp"
 #include "IOMultiplexer.hpp"
 #include "Logger.hpp"
 
@@ -13,13 +14,14 @@ namespace signal_handler {
 struct Signal : io_multiplexer::ioObject
 {
     using signalHandler = std::function<void(signal_info)>;
-    Signal();
+    Signal(io_context::IOContext& io);
     ~Signal();
 
     void addSignalHandler(signalNo sigNo, signalHandler handler);
     void startHandling();
 
   private:
+    io_context::IOContext& _io;
     std::map<signalNo, signalHandler> mHandlerMap;
     std::shared_ptr<spdlog::logger> mLogger;
     sigset_t mask;
