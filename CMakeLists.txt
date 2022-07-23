@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project("IO Multiplexer POC" VERSION 0.1.0)
+project("IO Multiplexer POC" VERSION 0.1.1)
 
 set(TARGET "ioMultiplexerPOC")
 
@@ -24,7 +24,7 @@ target_include_directories(${TARGET}
     ${CMAKE_CURRENT_SOURCE_DIR}
 
     ${CMAKE_SOURCE_DIR}/IOMultiplexer
-    ${CMAKE_SOURCE_DIR}/EventBus
+    ${CMAKE_SOURCE_DIR}/EventBus/EventBus
     ${CMAKE_SOURCE_DIR}/Timer
     ${CMAKE_SOURCE_DIR}/Event
     ${CMAKE_SOURCE_DIR}/Logger
