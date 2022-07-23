@@ -16,6 +16,7 @@ add_subdirectory(Logger)
 add_subdirectory(Signal)
 add_subdirectory(ThreadPool)
 add_subdirectory(IOContext)
+add_subdirectory(Socket)
 
 add_executable(${TARGET} main.cpp)
 
@@ -31,6 +32,7 @@ target_include_directories(${TARGET}
     ${CMAKE_SOURCE_DIR}/Signal
     ${CMAKE_SOURCE_DIR}/ThreadPool
     ${CMAKE_SOURCE_DIR}/IOContext
+    ${CMAKE_SOURCE_DIR}/Socket
 )
 
 target_link_libraries(${TARGET}

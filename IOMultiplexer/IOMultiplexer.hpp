@@ -14,6 +14,8 @@
 namespace io_multiplexer {
 struct ioObject
 {
+    ioObject(std::int32_t fd_) : fd(fd_) {}
+    ioObject() = default;
     std::int32_t fd;
 };
 
