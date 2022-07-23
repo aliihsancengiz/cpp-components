@@ -1,0 +1,3 @@
+[submodule "EventBus"]
+	path = EventBus
+	url = git@github.com:aliihsancengiz/event-bus.git

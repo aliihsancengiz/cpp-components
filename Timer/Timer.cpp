@@ -12,6 +12,9 @@ Timer::Timer(io_context::IOContext& io, uint64_t _period, TimerType _type, Timer
 }
 Timer::~Timer()
 {
+    if (!stopped) {
+        io_multiplexer::IOMultiplexer::getInstance().deregisterEvent(*this, EventType::READ);
+    }
     mLogger->trace("Timer Destructor");
     close(fd);
 }

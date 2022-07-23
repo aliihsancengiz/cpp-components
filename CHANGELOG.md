@@ -3,6 +3,9 @@
 
 ## Unversioned Changes
 
+# 0.1.1
+    - Add EventBus as submodule. 
+
 # 0.1.0
     - Add IO context object and integrate ioObjects(Timer,Event,Signal) with that.
 

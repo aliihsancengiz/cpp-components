@@ -14,12 +14,21 @@ struct MyData
     int foo;
 };
 
+std::atomic<bool> stopped{false};
+
+void signalHandler(int signum)
+{
+    stopped = true;
+}
+
 int main()
 {
     logger::LoggerConfigurator::getInstance().setLogLevel(logger::LogLevel::TRACE);
     logger::LoggerConfigurator::getInstance().setLogTarget(logger::LogTarget::CONSOLE);
 
     io_context::IOContext context;
+
+    signal(SIGINT, signalHandler);
 
     event::Event<MyData> mMydataHandler(context);
     mMydataHandler.addSubscriber([](MyData data) {
@@ -33,12 +42,10 @@ int main()
 
     t2.start();
 
-    while (true) {
+    while (!stopped.load()) {
         context.run();
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
-
-    t2.stop();
 
     return 0;
 }

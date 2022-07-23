@@ -1,6 +1,7 @@
 #include "ThreadPool.hpp"
 
 namespace thread_pool {
+
 ThreadPool::ThreadPool(std::size_t threadCount) : numberOfThread(threadCount)
 {
     isStop.store(false);
@@ -26,11 +27,13 @@ ThreadPool::ThreadPool(std::size_t threadCount) : numberOfThread(threadCount)
         });
     }
 }
+
 void ThreadPool::dispatch(Work&& w)
 {
     mWorkQueue.emplace(w);
     mWorkQueueNotifier.notify_one();
 }
+
 ThreadPool::~ThreadPool()
 {
     isStop.store(true);
