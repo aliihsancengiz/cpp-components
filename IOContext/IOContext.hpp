@@ -18,8 +18,11 @@ struct IOContext
     }
     void run();
 
+    std::shared_ptr<io_multiplexer::IOMultiplexer>& getMultiplexer();
+
   private:
-    std::unique_ptr<thread_pool::ThreadPool> pool;
+    std::shared_ptr<thread_pool::ThreadPool> pool;
+    std::shared_ptr<io_multiplexer::IOMultiplexer> multiplexerPtr;
     std::shared_ptr<spdlog::logger> mLogger;
     int threadCount;
 };

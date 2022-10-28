@@ -1,6 +1,7 @@
 #include "Timer.hpp"
 
 namespace timer {
+
 Timer::Timer(io_context::IOContext& io, uint64_t _period, TimerType _type, TimerCallback _cb)
     : _io(io), period(_period), type(_type), cb(_cb)
 {
@@ -10,14 +11,16 @@ Timer::Timer(io_context::IOContext& io, uint64_t _period, TimerType _type, Timer
     mLogger->trace("Create a {} Timer with period of {}",
                    type == TimerType::PERIODIC ? "Periodic" : "Oneshot", period);
 }
+
 Timer::~Timer()
 {
     if (!stopped) {
-        io_multiplexer::IOMultiplexer::getInstance().deregisterEvent(*this, EventType::READ);
+        _io.getMultiplexer()->deregisterEvent(*this, EventType::READ);
     }
     mLogger->trace("Timer Destructor");
     close(fd);
 }
+
 void Timer::start()
 {
     mLogger->trace("Starting timer. Timer File Descriptor {}", fd);
@@ -32,21 +35,23 @@ void Timer::start()
         new_value.it_interval.tv_nsec = 0;
     }
     timerfd_settime(fd, 0, &new_value, NULL);
-    io_multiplexer::IOMultiplexer::getInstance().registerEvent(
+    _io.getMultiplexer()->registerEvent(
       *this, EventType::READ,
       std::bind(&Timer::_timerhandler, this, std::placeholders::_1, std::placeholders::_2));
 }
+
 void Timer::stop()
 {
     mLogger->trace("Stopping timer. Timer File Descriptor {}", fd);
-    io_multiplexer::IOMultiplexer::getInstance().deregisterEvent(*this, EventType::READ);
+    _io.getMultiplexer()->deregisterEvent(*this, EventType::READ);
     stopped = true;
 }
+
 void Timer::_timerhandler(ioObject obj, EventType type)
 {
     uint64_t exp;
     if (type == EventType::READ) {
-        if (read(fd, &exp, sizeof(exp)) != sizeof(uint64_t)) {
+        if (::read(fd, &exp, sizeof(exp)) != sizeof(uint64_t)) {
             return;
         }
         if (!stopped) {
@@ -55,4 +60,5 @@ void Timer::_timerhandler(ioObject obj, EventType type)
         }
     }
 }
+
 }  // namespace timer
