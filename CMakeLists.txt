@@ -13,7 +13,6 @@ add_subdirectory(IOMultiplexer)
 add_subdirectory(Timer)
 add_subdirectory(Event)
 add_subdirectory(Logger)
-add_subdirectory(Signal)
 add_subdirectory(ThreadPool)
 add_subdirectory(IOContext)
 
@@ -28,7 +27,6 @@ target_include_directories(${TARGET}
     ${CMAKE_SOURCE_DIR}/Timer
     ${CMAKE_SOURCE_DIR}/Event
     ${CMAKE_SOURCE_DIR}/Logger
-    ${CMAKE_SOURCE_DIR}/Signal
     ${CMAKE_SOURCE_DIR}/ThreadPool
     ${CMAKE_SOURCE_DIR}/IOContext
 )
@@ -39,7 +37,6 @@ target_link_libraries(${TARGET}
     timer
     event
     logger
-    signal
     threadpool
     iocontext
     PRIVATE
