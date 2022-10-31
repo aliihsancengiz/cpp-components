@@ -1,6 +1,7 @@
 #include "IOMultiplexer.hpp"
 
 namespace io_multiplexer {
+
 static std::string IOEventTypeToString(const EventType& type)
 {
     switch (type) {
@@ -24,44 +25,46 @@ static std::string IOEventTypeToString(const EventType& type)
             break;
     }
 }
-IOMultiplexer::IOMultiplexer()
+
+IOMultiplexer::IOMultiplexer(std::shared_ptr<thread_pool::ThreadPool>& mPoolPtr)
+    : mThreadPoolPtr(mPoolPtr)
 {
     mLogger = logger::LoggerConfigurator::getInstance().getLogger("IOMultiplexer");
     mLogger->trace("Constructor");
     mEpollFd = epoll_create(MAX_EVENTS);
 }
+
 IOMultiplexer::~IOMultiplexer()
 {
     mLogger->trace("Destructor");
     close(mEpollFd);
 }
-IOMultiplexer& IOMultiplexer::getInstance()
-{
-    static IOMultiplexer ioInstance;
-    return ioInstance;
-}
+
 void IOMultiplexer::registerEvent(const ioObject& ioObj, const EventType& type, Callback cb)
 {
-    mLogger->trace("Registering Event Fd : {} , Event Type : {}", ioObj.fd,
-                   IOEventTypeToString(type));
+    mLogger->trace("Registering Event Fd : {} , Event Type : {}",
+                   ioObj.getUnderlyingFileDescriptor(), IOEventTypeToString(type));
 
     epoll_event ev;
-    mEventHandlerMap[ioObj.fd][type] = cb;
+    mEventHandlerMap[ioObj.getUnderlyingFileDescriptor()][type] = cb;
     ev.events = static_cast<int>(type);
-    ev.data.fd = ioObj.fd;
-    if (epoll_ctl(mEpollFd, EPOLL_CTL_ADD, ioObj.fd, &ev) == -1) {
-        mLogger->critical("Unableto add {} File descriptor epoll list.", ioObj.fd);
+    ev.data.fd = ioObj.getUnderlyingFileDescriptor();
+    if (epoll_ctl(mEpollFd, EPOLL_CTL_ADD, ioObj.getUnderlyingFileDescriptor(), &ev) == -1) {
+        mLogger->critical("Unableto add {} File descriptor epoll list.",
+                          ioObj.getUnderlyingFileDescriptor());
         mLogger->critical("Error No {}", std::to_string(errno));
         throw std::runtime_error("Error No : " + std::to_string(errno));
     }
 }
+
 void IOMultiplexer::deregisterEvent(const ioObject& ioObj, const EventType& type)
 {
-    mLogger->trace("Deregistering Event Fd : {} ,Event Type : {}", ioObj.fd,
-                   IOEventTypeToString(type));
-    epoll_ctl(mEpollFd, EPOLL_CTL_DEL, ioObj.fd, NULL);
-    mEventHandlerMap[ioObj.fd].erase(type);
+    mLogger->trace("Deregistering Event Fd : {} ,Event Type : {}",
+                   ioObj.getUnderlyingFileDescriptor(), IOEventTypeToString(type));
+    epoll_ctl(mEpollFd, EPOLL_CTL_DEL, ioObj.getUnderlyingFileDescriptor(), NULL);
+    mEventHandlerMap[ioObj.getUnderlyingFileDescriptor()].erase(type);
 }
+
 void IOMultiplexer::pollForIO()
 {
     epoll_event events[MAX_EVENTS];
@@ -77,7 +80,7 @@ void IOMultiplexer::pollForIO()
             try {
                 mLogger->trace(" Got an Event on File Descriptor : {} , Event  : {} ", fd,
                                IOEventTypeToString(type));
-                mEventHandlerMap[fd][type](io, type);
+                mThreadPoolPtr->dispatchWithArgs(mEventHandlerMap[fd][type], io, type);
             } catch (const std::exception& e) {
             }
         }

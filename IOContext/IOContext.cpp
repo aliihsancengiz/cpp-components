@@ -4,7 +4,8 @@ namespace io_context {
 
 IOContext::IOContext(int numberOfThreads) : threadCount(numberOfThreads)
 {
-    pool = std::make_unique<thread_pool::ThreadPool>(threadCount);
+    pool = std::make_shared<thread_pool::ThreadPool>(threadCount);
+	multiplexerPtr= std::make_shared<io_multiplexer::IOMultiplexer>(pool);
     mLogger = logger::LoggerConfigurator::getInstance().getLogger("IOContext");
     mLogger->trace("Constructor");
     mLogger->trace("A Thread Pool of {} thread is started", threadCount);
@@ -20,9 +21,15 @@ void IOContext::post(thread_pool::Work&& w)
     mLogger->trace("New Work Posted to Thread pool");
     pool->dispatch(std::forward<thread_pool::Work>(w));
 }
+
 void IOContext::run()
 {
-    io_multiplexer::IOMultiplexer::getInstance().pollForIO();
+    multiplexerPtr->pollForIO();
+}
+
+std::shared_ptr<io_multiplexer::IOMultiplexer>& IOContext::getMultiplexer()
+{
+	return multiplexerPtr;
 }
 
 }  // namespace io_context

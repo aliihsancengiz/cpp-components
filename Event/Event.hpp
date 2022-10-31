@@ -16,17 +16,19 @@ struct Event : io_multiplexer::ioObject
         mLogger =
           logger::LoggerConfigurator::getInstance().getLogger("Event-" + std::to_string(fd));
         mLogger->trace("Event Constructor");
-        io_multiplexer::IOMultiplexer::getInstance().registerEvent(
+        _io.getMultiplexer()->registerEvent(
           io_multiplexer::ioObject{fd}, io_multiplexer::EventType::READ,
           std::bind(&Event<TData>::readHandler, this, std::placeholders::_1,
                     std::placeholders::_2));
     }
+
     ~Event()
     {
         mLogger->trace("Event Destructor");
-        io_multiplexer::IOMultiplexer::getInstance().deregisterEvent(
-          io_multiplexer::ioObject{fd}, io_multiplexer::EventType::READ);
+        _io.getMultiplexer()->deregisterEvent(io_multiplexer::ioObject{fd},
+                                              io_multiplexer::EventType::READ);
     }
+
     void sendEvent(TData data)
     {
         mEventQueue.emplace(data);
@@ -36,6 +38,7 @@ struct Event : io_multiplexer::ioObject
             mLogger->critical("Failed to send event on File Descriptor : {}", fd);
         }
     }
+
     void addSubscriber(handler h)
     {
         mHandlerList.emplace_back(h);
