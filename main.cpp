@@ -3,11 +3,11 @@
 #include "IOContext.hpp"
 #include "IOMultiplexer.hpp"
 #include "Logger.hpp"
-#include "Signal.hpp"
 #include "ThreadPool.hpp"
 #include "Timer.hpp"
 
 #include <mutex>
+#include <csignal>
 
 struct MyData
 {
