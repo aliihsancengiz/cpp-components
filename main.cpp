@@ -5,7 +5,7 @@
 #include "Logger.hpp"
 #include "ThreadPool.hpp"
 #include "Timer.hpp"
-
+#include "Buffer.hpp"
 #include <mutex>
 #include <csignal>
 
