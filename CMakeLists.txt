@@ -15,6 +15,7 @@ add_subdirectory(Event)
 add_subdirectory(Logger)
 add_subdirectory(ThreadPool)
 add_subdirectory(IOContext)
+add_subdirectory(Buffer)
 
 add_executable(${TARGET} main.cpp)
 
@@ -29,6 +30,7 @@ target_include_directories(${TARGET}
     ${CMAKE_SOURCE_DIR}/Logger
     ${CMAKE_SOURCE_DIR}/ThreadPool
     ${CMAKE_SOURCE_DIR}/IOContext
+    ${CMAKE_SOURCE_DIR}/Buffer
 )
 
 target_link_libraries(${TARGET}
